@@ -1,0 +1,89 @@
+<html>
+<head>
+   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+ <!--[if lte IE 8]>
+     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+ <![endif]-->
+  <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+  <script src="assets/jquery-1.10.1.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <style>
+  body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #map {
+    height: 100%;
+}
+  </style>
+</head>
+<body>
+
+  <div id="map"></div>
+
+
+  <script>
+
+  var lat = 54.55932;
+  var long = -1.51611;
+  var markers = {};
+
+  if (navigator.geolocation)
+{
+// Get the current position
+
+navigator.geolocation.getCurrentPosition(function(position)
+{
+lat = position.coords.latitude;
+long = position.coords.longitude;
+});
+}
+
+
+
+  
+
+    var map = L.map('map').setView([lat, long], 6);
+
+L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+    }).addTo(map);
+
+
+    var popup = L.popup();
+
+    function drawMarkers(){
+      for (var k in markers) {
+        L.marker([markers[k].lat, markers[k].long]).addTo(map).bindPopup(markers[k].name).openPopup();
+      }
+     
+    }
+
+    function onMapClick(e) {
+$.ajax({
+    url: "lat/"+e.latlng.lat+"/long/"+e.latlng.lng,
+    dataType: "json"
+  }).done(function ( data ) {
+  
+  for(var i=0; i<data.length; i++){
+
+    markers[data[i].id]={name:data[i].name, lat:data[i].lat, long:data[i].long};
+  }
+
+  drawMarkers();
+  
+  });
+    
+  
+  };
+
+    map.on('click', onMapClick);
+
+  </script>
+
+  
+  
+ 
+</body></html>
